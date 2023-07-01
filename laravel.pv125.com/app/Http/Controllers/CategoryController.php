@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 use Validator;
 
 class CategoryController extends Controller
@@ -60,10 +61,10 @@ class CategoryController extends Controller
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                 required={"name", "image", "description"},
+     *                 required={"name","image","description"},
      *                 @OA\Property(
      *                     property="image",
-     *                     type="string"
+     *                     type="file",
      *                 ),
      *                 @OA\Property(
      *                     property="name",
@@ -94,6 +95,25 @@ class CategoryController extends Controller
         if($validator->fails()) {
             return response()->json($validator->errors(), 400,
                 ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+        }
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            // Generate a unique filename
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            $sizes = [50, 150, 300, 600, 1200];
+            foreach ($sizes as $size)
+            {
+                $fileSave = $size.'_'.$filename;
+                // Resize the image while maintaining aspect ratio
+                $resizedImage = Image::make($image)->resize($size, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode();
+                // Save the resized image
+                $path = public_path('uploads/' . $fileSave);
+                file_put_contents($path, $resizedImage);
+            }
+            $input['image'] = $filename;
         }
         $category = Category::create($input);
         return response()->json($category, 200,
@@ -142,18 +162,48 @@ class CategoryController extends Controller
         $input = $request->all();
         $message = array(
             'name.required'=>"Вкажіть назву категорії",
-            'image.required'=>"Вкажіть фото категорії",
             'description.required'=>"Вкажіть опис категорії",
         );
         $validator = Validator::make($input,[
             'name'=>'required',
-            'image'=>'required',
             'description'=>'required'
         ], $message);
         if($validator->fails()) {
             return response()->json($validator->errors(), 400,
                 ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
         }
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            // Generate a unique filename
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            $sizes = [50, 150, 300, 600, 1200];
+            //remove old images
+            foreach ($sizes as $size) {
+                $fileDelete = $size.'_'.$category->image;
+                $removePath = public_path('uploads/' . $fileDelete);
+                if (file_exists($removePath)) {
+                    unlink($removePath);
+                }
+            }
+
+            foreach ($sizes as $size)
+            {
+                $fileSave = $size.'_'.$filename;
+                // Resize the image while maintaining aspect ratio
+                $resizedImage = Image::make($image)->resize($size, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode();
+                // Save the resized image
+                $path = public_path('uploads/' . $fileSave);
+                file_put_contents($path, $resizedImage);
+            }
+            $input['image'] = $filename;
+        }
+        else {
+            $input['image'] = $category->image;
+        }
+
         $category->update($input);
         return response()->json($category, 200,
             ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
@@ -189,6 +239,15 @@ class CategoryController extends Controller
      */
     public function delete(Request $request, $id) {
         $category = Category::findOrFail($id);
+        $sizes = [50, 150, 300, 600, 1200];
+        //remove old images
+        foreach ($sizes as $size) {
+            $fileDelete = $size.'_'.$category->image;
+            $removePath = public_path('uploads/' . $fileDelete);
+            if (file_exists($removePath)) {
+                unlink($removePath);
+            }
+        }
         $category->delete();
         return 204;
     }

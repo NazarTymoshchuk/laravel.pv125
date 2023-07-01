@@ -2,34 +2,58 @@ import { useNavigate } from "react-router-dom";
 import { ICategoryCreate } from "./types";
 import { useFormik } from "formik";
 import axios from "axios";
+import { ChangeEvent } from "react";
+import defaultImage from "../../../assets/default.png";
+import http_common from "../../../http_common";
 
 const CategoryCreatePage = () => {
-    
+
     const navigate = useNavigate();
-    
+
     const init: ICategoryCreate = {
         name: "",
-        image: "",
+        image: null,
         description: ""
     };
-    
+
     const onFormikSubmit = async (values: ICategoryCreate) => {
-        console.log("Send Formik Data", values);
         try {
-            const result = await axios.post("http://laravel.pv125.com/api/category", values);
-            navigate("/");
+            const result = await http_common.post(`api/category`, values, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            navigate("..");
         }
         catch {
             console.log("Server error");
         }
     }
-    
+
     const formik = useFormik({
        initialValues: init,
-       onSubmit: onFormikSubmit 
+       onSubmit: onFormikSubmit
     });
-    
-    const {values, handleChange, handleSubmit } = formik;
+
+    const {values, handleChange, handleSubmit, setFieldValue } = formik;
+
+    const onChangeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if(files)
+        {
+            const file = files[0];
+            if(file) {
+                //Перевірка на тип обраного файлу - допустимий тип jpeg, png, gif
+                const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+                if (!allowedTypes.includes(file.type)) {
+                    alert("Не допустимий тип файлу");
+                    return;
+                }
+                setFieldValue(e.target.name, file);
+            }
+        }
+    }
+
     return (
         <>
             <h1 className="text-center">Додати категорію</h1>
@@ -44,10 +68,14 @@ const CategoryCreatePage = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label htmlFor="image" className="form-label">Фото</label>
-                        <input type="text" className="form-control" id="image"
-                               value={values.image}
-                               onChange={handleChange}
+                        <label htmlFor="image" className="form-label">
+                            <img src={values.image==null ? defaultImage: URL.createObjectURL(values.image)}
+                                 alt="фото"
+                                 width={200}
+                                 style={{cursor: "pointer"}}/>
+                        </label>
+                        <input type="file" className="form-control d-none" id="image"
+                               onChange={onChangeFileHandler}
                                name="image"/>
                     </div>
 

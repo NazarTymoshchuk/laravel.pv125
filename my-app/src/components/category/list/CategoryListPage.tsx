@@ -8,6 +8,7 @@ import Delete from "../delete/Delete";
 import CategoryEditPage from "../edit/CategoryEditPage";
 import http_common from "../../../http_common";
 import ModalDelete from "../../common/ModalDelete";
+import { APP_ENV } from "../../../env";
 
 interface ICategoryItem {
     id: number;
@@ -43,7 +44,7 @@ const CategoryListPage = () => {
         <>
             <div className="container">
                 <h1 className="text-center">Список категорій</h1>
-                <Link to="/category/create" className="btn btn-success">Додати</Link>
+                <Link to="create" className="btn btn-success">Додати</Link>
                 <table className="table">
                     <thead>
                     <tr>
@@ -61,13 +62,15 @@ const CategoryListPage = () => {
                             <tr key={c.id}>
                                 <th scope="row">{c.id}</th>
                                 <td>{c.name}</td>
-                                <td>{c.image}</td>
+                                <td>
+                                    <img src={`${APP_ENV.BASE_URL}uploads/150_${c.image}`} alt="фото" width={50}/>
+                                </td>
                                 <td>{c.description}</td>
                                 <td>
                                     <ModalDelete id={c.id} text={c.name} deleteFunc={onClickDelete}/>
                                 </td>
                                 <td>
-                                <Link to="/category/edit"  className="btn text-info"><FaRegEdit /></Link>
+                                    <Link to={`edit/${c.id}`} className="btn text-info" ><FaRegEdit /></Link>
                                 </td>
                             </tr>
                         );
