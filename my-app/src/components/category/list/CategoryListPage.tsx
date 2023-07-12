@@ -9,13 +9,7 @@ import CategoryEditPage from "../edit/CategoryEditPage";
 import http_common from "../../../http_common";
 import ModalDelete from "../../common/ModalDelete";
 import { APP_ENV } from "../../../env";
-
-interface ICategoryItem {
-    id: number;
-    name: string;
-    image: string;
-    description: string;
-}
+import { ICategoryItem } from "./types";
 
 const CategoryListPage = () => {
     const [list, setList] = useState<ICategoryItem[]>([]);

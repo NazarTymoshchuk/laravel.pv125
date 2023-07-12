@@ -1,0 +1,11 @@
+.card {
+    width: 250px;
+    height: 300px;
+    display: inline-block;
+    margin: 1rem;
+}
+
+.card img {
+    object-fit: cover;
+    height: 100%;
+}
