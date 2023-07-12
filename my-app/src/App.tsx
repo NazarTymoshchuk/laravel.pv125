@@ -10,13 +10,18 @@ import CategoryEditPage from "./components/category/edit/CategoryEditPage";
 import AdminLayout from "./components/admin/container/AdminLayout";
 import AdminDashboard from "./components/admin/dashboard/AdminDashboard";
 import HomePage from "./components/home/HomaPage";
+import DefaultLayout from "./components/container/DefaulLayout";
+import LoginPage from "./components/auth/login/LoginPage";
+import Loader from "./components/common/loader/Loader";
 
 function App() {
   return (
     <>
+      <Loader/>
       <Routes>
-        <Route path="/">
+        <Route path="/" element={<DefaultLayout/>}>
           <Route index element={<HomePage/>}/>
+          <Route path="login" element={<LoginPage/>}/>
         </Route>
         <Route path={"/admin"} element={<AdminLayout/>}>
             <Route index element={<AdminDashboard/>}/>
