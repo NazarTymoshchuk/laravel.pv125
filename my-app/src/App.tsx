@@ -15,7 +15,6 @@ import LoginPage from "./components/auth/login/LoginPage";
 import Loader from "./components/common/loader/Loader";
 import RegisterPage from "./components/auth/register/RegisterPage";
 import Notification from "./components/common/Notification/Notification";
-import TestNotification from "./components/common/Notification/TestNotification";
 
 function App() {
   return (
@@ -27,7 +26,6 @@ function App() {
           <Route index element={<HomePage/>}/>
           <Route path="login" element={<LoginPage/>}/>
           <Route path="register" element={<RegisterPage/>}/>
-          <Route path="notification" element={<TestNotification />}/>
         </Route>
         <Route path={"/admin"} element={<AdminLayout/>}>
             <Route index element={<AdminDashboard/>}/>
