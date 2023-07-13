@@ -5,6 +5,7 @@ import {useFormik} from "formik";
 import jwtDecode from "jwt-decode";
 import { AuthUserActionType, IUser } from "../types";
 import { useDispatch } from "react-redux";
+import { setNotification } from "../../common/Notification/notificationSlice";
 
 const LoginPage = () => {
 
@@ -29,10 +30,21 @@ const LoginPage = () => {
                     role: user.role
                 }
             });
+            dispatch(
+                setNotification({
+                  message: `Вітаємо ${user.name}`,
+                  type: 'success',
+                })
+            );
             console.log("User info", user);
         }
         catch {
-            setMessage("Дані вказнао не вірно");
+            dispatch(
+                setNotification({
+                  message: "Дані вказнао не вірно",
+                  type: 'error',
+                })
+            );
         }
     }
 
