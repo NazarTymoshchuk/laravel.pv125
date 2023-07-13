@@ -4,9 +4,12 @@ import {useFormik} from "formik";
 import {useNavigate} from "react-router-dom";
 import {IRegisterPage} from "./types";
 import CropperModal from "../../common/CropperModal";
+import { setNotification } from "../../common/Notification/notificationSlice";
+import { useDispatch } from "react-redux";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const init : IRegisterPage = {
         email: "",
@@ -18,10 +21,21 @@ const RegisterPage = () => {
     const onSubmitFormik = async (values: IRegisterPage) => {
         try {
             console.log("Register user")
+            dispatch(
+                setNotification({
+                  message: "Ви успішно зареєструвалися!",
+                  type: 'success',
+                })
+            );
             navigate("/");
         }
         catch {
-            setMessage("Дані вказнао не вірно");
+            dispatch(
+                setNotification({
+                  message: "Дані вказнао не вірно",
+                  type: 'error',
+                })
+            );
         }
     }
 
